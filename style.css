@@ -23,4 +23,46 @@ body {
   font-family: "Rubik", sans-serif;
   font-size: 16px;
   background-color: var(--bcg-color);
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* modal container  */
+.modal_container {
+  /* display: none; */
+  padding: 24px 28px;
+  height: 224px;
+  width: 343px;
+  background-color: var(--white);
+  border-radius: 8px;
+}
+.modal_container h5 {
+  color: var(--dark-blue);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 23.7px;
+  margin-bottom: 16px;
+}
+.modal_container p {
+  line-height: 24px;
+  font-weight: 400;
+  color: var(--grayish-blue);
+  margin-bottom: 16px;
+}
+
+.modal_container button {
+  width: 138px;
+  height: 48px;
+  border-radius: 8px;
+  border: none;
+  color: var(--white);
+  font-weight: 500;
+}
+.cancel {
+  background-color: var(--grayish-blue);
+}
+.delete {
+  background-color: var(--soft-red);
 }
