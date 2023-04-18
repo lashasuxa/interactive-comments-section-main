@@ -28,9 +28,12 @@ body {
   font-size: 16px;
   background-color: var(--bcg-color);
   width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-top: 32px;
+  position: relative;
 }
 
 /* card containers  */
@@ -39,6 +42,7 @@ body {
   border-radius: 8px;
   padding: 16px;
   border: 1px solid red;
+  margin-bottom: 16px;
 }
 .top {
   height: 32px;
@@ -51,6 +55,17 @@ body {
   color: var(--dark-blue);
   font-weight: 500;
   margin-left: 16px;
+}
+.card_container .you {
+  width: 36px;
+  height: 19px;
+  border-radius: 2px;
+  background-color: var(--moderate-blue);
+  color: var(--white);
+  text-align: center;
+  font-weight: 500;
+  font-size: 13px;
+  margin-left: 8px;
 }
 .card_container .time {
   color: var(--grayish-blue);
@@ -91,6 +106,13 @@ body {
   color: var(--moderate-blue);
   font-weight: 500;
   margin-left: 8px;
+}
+.delete_svg {
+  color: var(--soft-red);
+  margin-right: 16px;
+}
+.edit_svg {
+  color: var(--moderate-blue);
 }
 /* new comment container */
 .new_comment_container {
@@ -139,7 +161,7 @@ body {
 
 /* modal container  */
 .modal_container {
-  /* display: none; */
+  display: none;
   padding: 24px 28px;
   height: 224px;
   width: 343px;
@@ -177,4 +199,22 @@ body {
 }
 .delete {
   background-color: var(--soft-red);
+}
+/* modal container position after clicking delete */
+.modal_active {
+  display: block;
+  position: absolute;
+  top: 200px;
+}
+
+/* here apears div which covers whole page and it gets oppacity  */
+.backdrop {
+  display: none;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  background-color: #000000;
+  mix-blend-mode: normal;
+  opacity: 0.5;
 }
