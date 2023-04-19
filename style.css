@@ -33,7 +33,7 @@ body {
   flex-direction: column;
   align-items: center;
   padding-top: 32px;
-  position: relative;
+  /* position: relative; */
 }
 
 /* card containers  */
@@ -75,6 +75,9 @@ body {
 .card_container p {
   width: 311px;
   margin-bottom: 16px;
+}
+.card_container .mention {
+  color: var(--moderate-blue);
 }
 .bottom {
   display: flex;
@@ -118,19 +121,20 @@ body {
 .new_comment_container {
   padding: 16px;
   height: 189px;
+  width: 343px;
   background-color: var(--white);
   border-radius: 8px;
   border: 1px solid red;
   position: relative;
 }
-.new_comment_container input {
+.new_comment_container textarea {
   width: 100%;
   height: 96px;
   border-radius: 8px;
   border: 1px solid #e9ebf0;
   position: relative;
 }
-.new_comment_container input::placeholder {
+.new_comment_container textarea::placeholder {
   position: absolute;
   top: 12px;
   left: 24px;
