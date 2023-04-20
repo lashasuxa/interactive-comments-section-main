@@ -35,18 +35,38 @@ body {
   padding-top: 32px;
   /* position: relative; */
 }
+.svg_plus {
+  width: 11px;
+  height: 11px;
+}
+.svg_minus {
+  width: 11px;
+  height: 3px;
+}
+.svg_reply {
+  width: 14px;
+  height: 13px;
+}
+.svg_edit {
+  width: 14px;
+  height: 14px;
+}
+.svg_delete {
+  width: 12px;
+  height: 14px;
+}
 
 /* card containers  */
 .card_container {
   background-color: var(--white);
   border-radius: 8px;
   padding: 16px;
-  border: 1px solid red;
+
   margin-bottom: 16px;
 }
 .top {
   height: 32px;
-  border: 1px solid red;
+
   display: flex;
   align-items: center;
   margin-bottom: 16px;
@@ -108,13 +128,18 @@ body {
 .reply {
   color: var(--moderate-blue);
   font-weight: 500;
+  font-size: 16px;
   margin-left: 8px;
+}
+.reply_button {
+  border: none;
+  background: transparent;
 }
 .delete_svg {
   color: var(--soft-red);
   margin-right: 16px;
 }
-.edit_svg {
+.edit_text {
   color: var(--moderate-blue);
 }
 /* new comment container */
@@ -124,7 +149,7 @@ body {
   width: 343px;
   background-color: var(--white);
   border-radius: 8px;
-  border: 1px solid red;
+
   position: relative;
 }
 .new_comment_container textarea {
@@ -171,7 +196,6 @@ body {
   width: 343px;
   background-color: var(--white);
   border-radius: 8px;
-  border: 1px solid red;
 }
 .modal_container h5 {
   color: var(--dark-blue);
