@@ -24,6 +24,66 @@ const createImgElement = (tag, className, src, alt) => {
   return elem;
 };
 
+function renderComments(comments) {
+  // Clear the base_comments_container
+  base_comments_container.innerHTML = "";
+
+  // Iterate through the comments array
+  comments.forEach((comment) => {
+    // Create the comment card for the main comment
+    const commentCard = createCommentCard(comment, false);
+
+    // Append the comment card to the base_comments_container
+    base_comments_container.appendChild(commentCard);
+
+    // Check if the comment has replies
+    if (comment.replies && comment.replies.length > 0) {
+      // Iterate through the replies
+      comment.replies.forEach((reply) => {
+        // Create the comment card for the reply
+        const replyCard = createCommentCard(reply, true);
+
+        // Append the reply card to the base_comments_container
+        base_comments_container.appendChild(replyCard);
+      });
+    }
+  });
+}
+
+//create new comment
+
+const sendBtn = document.querySelector(".send");
+
+const replied_comments_container = document.querySelector(
+  ".replied_comments_container"
+);
+sendBtn.addEventListener("click", () => {
+  if (textArea.value === "") {
+    return;
+  }
+
+  const newCommentData = {
+    id: data.comments.length + 1, // Assign a new ID
+    user: {
+      username: data.currentUser.username,
+      image: {
+        png: data.currentUser.image.png,
+      },
+    },
+    content: textArea.value,
+    replyingTo: "",
+    createdAt: "now",
+    score: 0,
+  };
+
+  data.comments.push(newCommentData);
+  console.log(data.comments);
+  console.log(newCommentData.id);
+  renderComments(data.comments);
+  textArea.value = "";
+  return data.comments;
+});
+
 const createCommentCard = (element, isReply) => {
   // Create card_container
   const card_container = createDomElement("div", "card_container");
@@ -121,11 +181,28 @@ const createCommentCard = (element, isReply) => {
     });
     //
     const deleteBtn = document.querySelector(".delete");
-    deleteBtn.addEventListener("click", () => {
-      card_container.remove();
+    function filterDataById(id) {
+      // Filter the data.comments array by excluding the object with the specified id
+      const filteredData = data.comments.filter((comment) => comment.id !== id);
+
+      return filteredData;
+    }
+    //
+
+    deleteBtn.addEventListener("click", (e) => {
+      console.log(data.comments.length);
+      const id = data.comments.length;
+      const filteredData = filterDataById(id);
+      data.comments = filteredData;
+      console.log(data.comments);
+      // Re-render the comments after deleting the comment
+      renderComments(data.comments);
+
+      // Hide the modal and backdrop
       modal.classList.remove("modal_active");
       backdrop.style.display = "none";
     });
+
     //
     const deleteText = createDomElement("span", "delete_svg", null, "Delete");
     deleteText.addEventListener("click", deleteButtonListener);
@@ -135,25 +212,92 @@ const createCommentCard = (element, isReply) => {
       "./images/icon-edit.svg",
       ""
     );
+    const updateBtn = createDomElement("button", "update_btn", null, "update");
+    updateBtn.addEventListener("click", () => {
+      comment.blur();
+      console.log("clicked update btn blur");
+      updateBtn.style.display = "none";
+      editDeleteContainer.style.display = "block";
+    });
     const editButtonListener = () => {
       console.log("edit");
       comment.contentEditable = true;
       comment.focus();
+      updateBtn.style.display = "block";
+      editDeleteContainer.style.display = "none";
     };
     const editText = createDomElement("span", "edit_text", null, "Edit");
     editText.addEventListener("click", editButtonListener);
 
     editDeleteContainer.append(deleteImg, deleteText, editImg, editText);
-    bottom.append(plusMinus, editDeleteContainer);
+    bottom.append(plusMinus, editDeleteContainer, updateBtn);
   } //in case if current user != username then it creates container with reply button
   else {
-    const replyButtonListener = (event) => {
-      // we don't need event here as param
+    const replyButtonListener = () => {
+      // Create the container div
+      const newCommentContainer = document.createElement("div");
+      newCommentContainer.className = "new_comment_container";
+
+      // Create the textarea element
+      const addCommentTextArea = document.createElement("textarea");
+      addCommentTextArea.id = "add_comment";
+      addCommentTextArea.placeholder = "Add a comment...";
+
+      // Create the image element
+      const userAvatar = document.createElement("img");
+      userAvatar.src = "./images/avatars/image-juliusomo.png";
+      userAvatar.alt = "";
+
+      // Create the send button element
+      const replySendButton = createDomElement("button", "send", null, "Reply");
+
+      replySendButton.addEventListener("click", () => {
+        console.log(element.replies);
+        newCommentContainer.remove();
+        console.log("removed");
+        //
+
+        const newReplyCommentData = {
+          id: data.comments.length + 1, // Assign a new ID
+          content: addCommentTextArea.value,
+          createdAt: "now",
+          score: 37,
+          replyingTo: element.user.username,
+          user: {
+            image: {
+              png: data.currentUser.image.png,
+            },
+            username: data.currentUser.username,
+          },
+        };
+
+        base_comments_container.append(
+          createCommentCard(newReplyCommentData, isReply)
+        );
+
+        console.log(newReplyCommentData.id);
+        console.log(newReplyCommentData);
+        console.log(element.replies);
+      });
+
+      // Append the textarea, image, and button elements to the container div
+      newCommentContainer.append(
+        addCommentTextArea,
+        userAvatar,
+        replySendButton
+      );
+
+      // Append the newCommentContainer to the base_comments_container
+      base_comments_container.append(newCommentContainer);
+
+      // Focus the textarea and insert the username
       const username = element.user.username;
-      textArea.focus();
-      textArea.innerText = `@${username} `;
-      console.log("Clicked reply on:", username);
-      console.log(textArea.value);
+      addCommentTextArea.focus();
+      addCommentTextArea.value = `@${username} `;
+
+      //   console.log("Clicked reply on:", username);
+      //   console.log(addCommentTextArea.value);
+      console.log(element.replies);
     };
 
     const replyContainer = document.createElement("div");
@@ -206,41 +350,4 @@ data.comments.forEach((comment) => {
     });
   }
 });
-
-//create new comment
-
-const sendBtn = document.querySelector(".send");
-
-const replied_comments_container = document.querySelector(
-  ".replied_comments_container"
-);
-sendBtn.addEventListener("click", () => {
-  if (textArea.value === "") {
-    return;
-  }
-
-  const newCommentData = {
-    user: {
-      username: data.currentUser.username,
-      image: {
-        png: data.currentUser.image.png,
-      },
-    },
-    content: textArea.value,
-    replyingTo: "",
-    createdAt: "now",
-    score: 0,
-  };
-
-  const isReply = false;
-  const currentUsername = data.currentUser.username;
-  // აქ ვქმნით ახალ ელემენტს და ვამატებთ დომ-ში
-  const newCommentCard = createCommentCard(
-    newCommentData,
-    isReply,
-    currentUsername
-  );
-  replied_comments_container.append(newCommentCard);
-
-  textArea.value = "";
-});
+renderComments(data.comments);
