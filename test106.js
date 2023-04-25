@@ -1,5 +1,22 @@
 import data from "./data.json" assert { type: "json" };
+//delete btn from modal
+const deleteBtn = document.querySelector(".delete");
+deleteBtn.addEventListener("click", (e) => {
+  // console.log(data.comments.length);
+  const id = data.comments.length;
+  const filteredData = filterDataById(id);
+  data.comments = filteredData;
+  console.log(filteredData);
+  // console.log(data.comments);
+  console.log(id);
+  // Re-render the comments after deleting the comment
+  renderComments(data.comments);
 
+  // Hide the modal and backdrop
+  modal.classList.remove("modal_active");
+  backdrop.style.display = "none";
+});
+//getting elements from dome
 const base_comments_container = document.querySelector(
   ".base_comments_container"
 );
@@ -71,13 +88,14 @@ sendBtn.addEventListener("click", () => {
       },
     },
     content: textArea.value,
-    replyingTo: "",
+    // replyingTo: "",
     createdAt: "now",
     score: 0,
+    replies: [],
   };
 
   data.comments.push(newCommentData);
-  console.log(data.comments);
+  // console.log(data.comments);
   console.log(newCommentData.id);
   renderComments(data.comments);
   textArea.value = "";
@@ -112,6 +130,8 @@ const createCommentCard = (element, isReply) => {
       element.replyingTo
     );
     comment.appendChild(mention);
+
+    ////
   }
 
   const commentText = document.createTextNode(element.content);
@@ -179,29 +199,9 @@ const createCommentCard = (element, isReply) => {
       modal.classList.remove("modal_active");
       backdrop.style.display = "none";
     });
+    // here starts delete function
+
     //
-    const deleteBtn = document.querySelector(".delete");
-    function filterDataById(id) {
-      // Filter the data.comments array by excluding the object with the specified id
-      const filteredData = data.comments.filter((comment) => comment.id !== id);
-
-      return filteredData;
-    }
-    //
-
-    deleteBtn.addEventListener("click", (e) => {
-      console.log(data.comments.length);
-      const id = data.comments.length;
-      const filteredData = filterDataById(id);
-      data.comments = filteredData;
-      console.log(data.comments);
-      // Re-render the comments after deleting the comment
-      renderComments(data.comments);
-
-      // Hide the modal and backdrop
-      modal.classList.remove("modal_active");
-      backdrop.style.display = "none";
-    });
 
     //
     const deleteText = createDomElement("span", "delete_svg", null, "Delete");
@@ -215,12 +215,12 @@ const createCommentCard = (element, isReply) => {
     const updateBtn = createDomElement("button", "update_btn", null, "update");
     updateBtn.addEventListener("click", () => {
       comment.blur();
-      console.log("clicked update btn blur");
+      // console.log("clicked update btn blur");
       updateBtn.style.display = "none";
       editDeleteContainer.style.display = "block";
     });
     const editButtonListener = () => {
-      console.log("edit");
+      // console.log("edit");
       comment.contentEditable = true;
       comment.focus();
       updateBtn.style.display = "block";
@@ -252,9 +252,9 @@ const createCommentCard = (element, isReply) => {
       const replySendButton = createDomElement("button", "send", null, "Reply");
 
       replySendButton.addEventListener("click", () => {
-        console.log(element.replies);
+        // console.log(element.replies);
         newCommentContainer.remove();
-        console.log("removed");
+        // console.log("removed");
         //
 
         const newReplyCommentData = {
@@ -275,9 +275,9 @@ const createCommentCard = (element, isReply) => {
           createCommentCard(newReplyCommentData, isReply)
         );
 
-        console.log(newReplyCommentData.id);
-        console.log(newReplyCommentData);
-        console.log(element.replies);
+        // console.log(newReplyCommentData.id);
+        // console.log(newReplyCommentData);
+        // console.log(element.replies);
       });
 
       // Append the textarea, image, and button elements to the container div
@@ -297,7 +297,7 @@ const createCommentCard = (element, isReply) => {
 
       //   console.log("Clicked reply on:", username);
       //   console.log(addCommentTextArea.value);
-      console.log(element.replies);
+      // console.log(element.replies);
     };
 
     const replyContainer = document.createElement("div");
@@ -350,4 +350,12 @@ data.comments.forEach((comment) => {
     });
   }
 });
+
+function filterDataById(id) {
+  console.log("foo");
+  // Filter the data.comments array by excluding the object with the specified id
+  const filteredData = data.comments.filter((comment) => comment.id !== id);
+
+  return filteredData;
+}
 renderComments(data.comments);
