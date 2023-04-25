@@ -106,12 +106,15 @@ const createCommentCard = (element, isReply) => {
   // Create comment
   const comment = createDomElement("p", "comment", null, "");
 
-  //   if (isReply) {
-  const mention = createDomElement("span", "mention", null, element.replyingTo);
-  comment.appendChild(mention);
-
-  ////
-  //   }
+  if (isReply && !element.replyingToUser) {
+    const mention = createDomElement(
+      "span",
+      "mention",
+      null,
+      `@${element.replyingTo} `
+    );
+    comment.appendChild(mention);
+  }
 
   const commentText = document.createTextNode(element.content);
   comment.appendChild(commentText);
@@ -172,7 +175,12 @@ const createCommentCard = (element, isReply) => {
     const deleteButtonListener = () => {
       modal.classList.add("modal_active");
       backdrop.style.display = "block";
+      // Store the comment's card_container as a data attribute on the delete button
+      deleteBtn.cardContainer = card_container;
+      // Set the comment's ID
+      deleteBtn.commentId = element.id;
     };
+
     const cancelBtn = document.querySelector(".cancel");
     cancelBtn.addEventListener("click", () => {
       modal.classList.remove("modal_active");
@@ -194,14 +202,24 @@ const createCommentCard = (element, isReply) => {
     const updateBtn = createDomElement("button", "update_btn", null, "update");
     updateBtn.addEventListener("click", () => {
       comment.blur();
-      // console.log("clicked update btn blur");
+
       updateBtn.style.display = "none";
       editDeleteContainer.style.display = "block";
     });
+    // after clicking update button to start typing from the end of the textarea typed text
+    function moveCaretToEnd(element) {
+      const range = document.createRange();
+      const selection = window.getSelection();
+      range.selectNodeContents(element);
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      element.focus();
+    }
     const editButtonListener = () => {
       // console.log("edit");
       comment.contentEditable = true;
-      comment.focus();
+      moveCaretToEnd(comment);
       updateBtn.style.display = "block";
       editDeleteContainer.style.display = "none";
     };
@@ -220,7 +238,7 @@ const createCommentCard = (element, isReply) => {
       // Create the textarea element
       const addCommentTextArea = document.createElement("textarea");
       addCommentTextArea.id = "add_comment";
-      //   addCommentTextArea.placeholder = "Add a comment...";
+      addCommentTextArea.placeholder = "say something Add a comment...";
 
       // Create the image element
       const userAvatar = document.createElement("img");
@@ -231,17 +249,15 @@ const createCommentCard = (element, isReply) => {
       const replySendButton = createDomElement("button", "send", null, "Reply");
 
       replySendButton.addEventListener("click", () => {
-        // console.log(element.replies);
         newCommentContainer.remove();
-        // console.log("removed");
-        //
 
         const newReplyCommentData = {
           id: data.comments.length + 1, // Assign a new ID
           content: addCommentTextArea.value,
           createdAt: "now",
-          score: 37,
-          replyingTo: `@${element.user.username} `,
+          score: 0,
+          replyingTo: element.user.username,
+          replyingToUser: element.user.username,
           replies: [],
           user: {
             image: {
@@ -254,10 +270,6 @@ const createCommentCard = (element, isReply) => {
         base_comments_container.append(
           createCommentCard(newReplyCommentData, isReply)
         );
-
-        // console.log(newReplyCommentData.id);
-        // console.log(newReplyCommentData);
-        // console.log(element.replies);
       });
 
       // Append the textarea, image, and button elements to the container div
@@ -273,9 +285,8 @@ const createCommentCard = (element, isReply) => {
       // Focus the textarea and insert the username
       const username = element.user.username;
       addCommentTextArea.focus();
-      //   console.log("Clicked reply on:", username);
-      //   console.log(addCommentTextArea.value);
-      // console.log(element.replies);
+      addCommentTextArea.value = `@${username} `;
+      console.log("Clicked reply on:", username);
     };
 
     const replyContainer = document.createElement("div");
@@ -331,16 +342,15 @@ data.comments.forEach((comment) => {
 
 const deleteBtn = document.querySelector(".delete");
 deleteBtn.addEventListener("click", (e) => {
-  console.log("yes of course");
-  console.log(data.comments.length);
-  const id = data.comments.length;
+  // Remove the comment or reply directly from the DOM
+  if (e.target.cardContainer) {
+    e.target.cardContainer.remove();
+  }
+
+  // Update the data.comments array
+  const id = parseInt(e.target.commentId);
   const filteredData = filterDataById(id);
   data.comments = filteredData;
-  console.log(filteredData);
-  // console.log(data.comments);
-  console.log(id);
-  // Re-render the comments after deleting the comment
-  renderComments(data.comments);
 
   // Hide the modal and backdrop
   modal.classList.remove("modal_active");
@@ -348,11 +358,22 @@ deleteBtn.addEventListener("click", (e) => {
 });
 
 function filterDataById(id) {
-  console.log("foo");
-  // Filter the data.comments array by excluding the object with the specified id
-  const filteredData = data.comments.filter((comment) => comment.id !== id);
+  // First, try to find and remove the comment with the specified id
+  let filteredData = data.comments.filter((comment) => comment.id !== id);
+
+  // If the comment was not found, try to find and remove it from the replies
+  if (filteredData.length === data.comments.length) {
+    filteredData = data.comments.map((comment) => {
+      if (comment.replies) {
+        const filteredReplies = comment.replies.filter(
+          (reply) => reply.id !== id
+        );
+        return { ...comment, replies: filteredReplies };
+      }
+      return comment;
+    });
+  }
 
   return filteredData;
 }
 renderComments(data.comments);
-console.log(data.comments);
